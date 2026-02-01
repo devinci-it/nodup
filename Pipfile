@@ -6,5 +6,6 @@ name = "pypi"
 [packages]
 pipenv = "*"
 argcomplete = "*"
+nodup = {file = "."}
 
 [dev-packages]

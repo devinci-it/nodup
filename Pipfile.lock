@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "27f114220fe1a50a7d929fd5e2391d76f36ecab871a3ca61a45c8a32c9dd5e0c"
+            "sha256": "0c05c187f641b9b462db367a8dcc94b35dd6c6aae8740a88979b87778b94e461"
         },
         "pipfile-spec": 6,
         "requires": {},
@@ -45,6 +45,9 @@
             ],
             "markers": "python_version >= '3.10'",
             "version": "==3.20.3"
+        },
+        "nodup": {
+            "file": "."
         },
         "packaging": {
             "hashes": [

@@ -6,10 +6,11 @@ YELLOW="\033[0;33m"
 BLUE="\033[0;34m"
 RED="\033[0;31m"
 RESET="\033[0m"  # Reset color to default
+
+# Function to print the banner
 print_banner() {
     local BLUE=$1
     local RESET=$2
-    
     echo -e "${BLUE}                             
                 █▄            
  ▄              ██            
@@ -23,21 +24,21 @@ ${RESET}"
 
 # Function to print instructions for bashrc update
 print_instructions_for_bashrc_update() {
-    echo "To update your ~/.bashrc, run the following commands:"
+    echo -e "${YELLOW}To update your ~/.bashrc, run the following commands:${RESET}"
     echo ""
-    echo "1. Add ~/.local/bin to your PATH:"
-    echo '   echo \"export PATH=\"$HOME/.local/bin:$PATH\"\" >> ~/.bashrc'
-    echo '   source ~/.bashrc'
+    echo -e "${GREEN}1. Add ~/.local/bin to your PATH:${RESET}"
+    echo -e '   echo \"export PATH=\"$HOME/.local/bin:$PATH\"\" >> ~/.bashrc'
+    echo -e '   source ~/.bashrc'
     echo ""
-    echo "2. Enable pipenv auto-completion:"
-    echo '   echo \"eval \"\$(pipenv --completion)\"\" >> ~/.bashrc'
-    echo '   source ~/.bashrc'
+    echo -e "${GREEN}2. Enable pipenv auto-completion:${RESET}"
+    echo -e '   echo \"eval \"\$(pipenv --completion)\"\" >> ~/.bashrc'
+    echo -e '   source ~/.bashrc'
     echo ""
-    echo "3. Enable auto-completion for nodup (if using argcomplete):"
-    echo '   echo \"eval \"\$(register-python-argcomplete nodup)\"\" >> ~/.bashrc'
-    echo '   source ~/.bashrc'
+    echo -e "${GREEN}3. Enable auto-completion for nodup (if using argcomplete):${RESET}"
+    echo -e '   echo \"eval \"\$(register-python-argcomplete nodup)\"\" >> ~/.bashrc'
+    echo -e '   source ~/.bashrc'
     echo ""
-    echo "Once you run these commands, restart your terminal or run 'source ~/.bashrc' to apply the changes."
+    echo -e "${YELLOW}Once you run these commands, restart your terminal or run 'source ~/.bashrc' to apply the changes.${RESET}"
 }
 
 # Main Install Script
@@ -46,9 +47,11 @@ PROJECT_DIR="$(cd "$(dirname "$0")" && pwd)"
 BIN_DIR="$HOME/.local/bin"
 WRAPPER="$BIN_DIR/$APP_NAME"
 
-# Redirect all stdout and stderr to install.log
+# Log file to capture installation process
 LOG_FILE="./install.log"
-exec > >(tee -a "$LOG_FILE") 2>&1
+
+# Append to the log file instead of overwriting
+exec >> >(tee -a "$LOG_FILE") 2>&1
 
 # Check if pipenv is installed
 check_pipenv() {
@@ -85,7 +88,21 @@ generate_wrapper_script() {
   echo -e "    ✅ ${GREEN}Wrapper script generated and made executable${RESET}"
 }
 
+# Verify nodup executable in venv bin directory
+verify_nodup_executable() {
+  VENV_PATH=$(cd "$PROJECT_DIR" && pipenv --venv)
+  VENV_BIN_DIR="$VENV_PATH/bin"
+
+  if [ ! -f "$VENV_BIN_DIR/$APP_NAME" ]; then
+    echo "❌ $APP_NAME executable not found in virtual environment at $VENV_BIN_DIR."
+    exit 1
+  fi
+
+  echo -e "    ✅ ${GREEN}$APP_NAME executable found in virtual environment at $VENV_BIN_DIR${RESET}"
+}
+
 # Start installation
+print_banner "$BLUE" "$RESET"
 echo -e "▶ ${BLUE}Starting installation for $APP_NAME...${RESET}"
 echo "Logging to $LOG_FILE"
 
@@ -101,6 +118,11 @@ if check_pipenv; then
   pipenv --python "$PYTHON_VERSION" install --dev >> "$LOG_FILE" 2>&1
   echo -e "    ✅ ${GREEN}pipenv environment created with Python $PYTHON_VERSION${RESET}"
 
+  # cd into the project directory and run `pipenv install .` to install dependencies
+  echo -e "  ▶ ${BLUE}Installing project dependencies with pipenv...${RESET}"
+  cd "$PROJECT_DIR" && pipenv install . >> "$LOG_FILE" 2>&1
+  echo -e "    ✅ ${GREEN}Dependencies installed with pipenv${RESET}"
+
   # Upgrade pip inside the pipenv environment
   echo -e "  ▶ ${BLUE}Upgrading pip in pipenv environment...${RESET}"
   $(pipenv --venv)/bin/pip install --upgrade pip >> "$LOG_FILE" 2>&1
@@ -110,9 +132,14 @@ if check_pipenv; then
   echo -e "  ▶ ${BLUE}Upgrading pipenv...${RESET}"
   $(pipenv --venv)/bin/pip install --upgrade pipenv >> "$LOG_FILE" 2>&1
   echo -e "    ✅ ${GREEN}pipenv upgraded to latest version${RESET}"
+
+  # Verify the executable after installation
+  verify_nodup_executable
+
 else
   echo -e "⚠️ ${YELLOW}pipenv is not installed, falling back to venv...${RESET}"
   create_venv
+  verify_nodup_executable
 fi
 
 # Ensure the binary directory exists
@@ -130,4 +157,5 @@ echo -e "➡ ${BLUE}You can run: $APP_NAME --help${RESET}"
 echo -e "➡ ${YELLOW}Ensure ~/.local/bin is in your PATH${RESET}"
 
 # Print bashrc update instructions
-print_instructions_for_bashrc_update "$BLUE" "$RESET"
+print_instructions_for_bashrc_update
+

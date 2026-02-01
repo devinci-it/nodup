@@ -6,10 +6,9 @@
 # Define Project Details
 PROJECT_DIR="{{PROJECT_DIR}}"
 EXEC_NAME="{{EXEC_NAME}}"
-
 # Try to derive the virtual environment path based on pipenv
 VENV_PATH=$(cd "$PROJECT_DIR" && pipenv --venv)
-
+EXEC_ABS_PATH="$VENV_PATH/bin/$EXEC_NAME"
 # Fallback to looking for the .venv directory inside the project if pipenv venv is not found
 if [ ! -d "$VENV_PATH" ]; then
     echo "❌ pipenv virtual environment not found. Looking for .venv directory..."
@@ -36,4 +35,4 @@ fi
 
 # Execute the executable with the passed parameters
 echo "Executing: $VENV_BIN_DIR/$EXEC_NAME $@"
-"$VENV_BIN_DIR/$EXEC_NAME" "$@"
+"$EXEC_ABS_PATH" "$@"
