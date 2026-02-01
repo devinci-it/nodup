@@ -1,0 +1,6 @@
+include README.md
+include setup.py
+include install.sh
+include wrapper.tmpl
+include LICENSE
+
