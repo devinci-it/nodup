@@ -81,7 +81,7 @@ generate_wrapper_script() {
   sed \
     -e "s|{{PROJECT_DIR}}|$PROJECT_DIR|g" \
     -e "s|{{EXEC_NAME}}|$APP_NAME|g" \
-    "$PROJECT_DIR/wrapper.tmpl" > "$WRAPPER"
+    "$PROJECT_DIR/templates/wrapper.tmpl" > "$WRAPPER"
 
   # Make the wrapper script executable
   chmod +x "$WRAPPER" >> "$LOG_FILE" 2>&1
