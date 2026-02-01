@@ -101,6 +101,13 @@ verify_nodup_executable() {
   echo -e "    ✅ ${GREEN}$APP_NAME executable found in virtual environment at $VENV_BIN_DIR${RESET}"
 }
 
+# Ensure setuptools and wheel are installed in the venv
+ensure_setuptools_and_wheel() {
+  echo -e "▶ ${BLUE}Ensuring setuptools and wheel are installed...${RESET}"
+  pip install --upgrade setuptools wheel >> "$LOG_FILE" 2>&1
+  echo -e "    ✅ ${GREEN}setuptools and wheel installed/updated${RESET}"
+}
+
 # Start installation
 print_banner "$BLUE" "$RESET"
 echo -e "▶ ${BLUE}Starting installation for $APP_NAME...${RESET}"
@@ -118,20 +125,16 @@ if check_pipenv; then
   pipenv --python "$PYTHON_VERSION" install --dev >> "$LOG_FILE" 2>&1
   echo -e "    ✅ ${GREEN}pipenv environment created with Python $PYTHON_VERSION${RESET}"
 
-  # cd into the project directory and run `pipenv install .` to install dependencies
-  echo -e "  ▶ ${BLUE}Installing project dependencies with pipenv...${RESET}"
-  cd "$PROJECT_DIR" && pipenv install . >> "$LOG_FILE" 2>&1
-  echo -e "    ✅ ${GREEN}Dependencies installed with pipenv${RESET}"
-
-  # Upgrade pip inside the pipenv environment
-  echo -e "  ▶ ${BLUE}Upgrading pip in pipenv environment...${RESET}"
-  $(pipenv --venv)/bin/pip install --upgrade pip >> "$LOG_FILE" 2>&1
-  echo -e "    ✅ ${GREEN}pip upgraded inside pipenv environment${RESET}"
-
-  # Upgrade pipenv itself
-  echo -e "  ▶ ${BLUE}Upgrading pipenv...${RESET}"
-  $(pipenv --venv)/bin/pip install --upgrade pipenv >> "$LOG_FILE" 2>&1
-  echo -e "    ✅ ${GREEN}pipenv upgraded to latest version${RESET}"
+  # cd into the project directory and ensure setuptools/wheel are installed, then run bdist_wheel
+  cd "$PROJECT_DIR"
+  ensure_setuptools_and_wheel
+  VENV_PATH=$(pipenv --venv)
+  VENV_BIN_DIR="$VENV_PATH/bin"
+  
+  # Run setup.py to build the wheel using the Python in the virtualenv
+  echo -e "  ▶ ${BLUE}Building wheel...${RESET}"
+  "$VENV_BIN_DIR/python3" setup.py bdist_wheel >> "$LOG_FILE" 2>&1
+  echo -e "    ✅ ${GREEN}Wheel built successfully${RESET}"
 
   # Verify the executable after installation
   verify_nodup_executable
@@ -139,6 +142,15 @@ if check_pipenv; then
 else
   echo -e "⚠️ ${YELLOW}pipenv is not installed, falling back to venv...${RESET}"
   create_venv
+  ensure_setuptools_and_wheel
+  VENV_BIN_DIR="$PROJECT_DIR/venv/bin"
+  
+  # Run setup.py to build the wheel using the Python in the venv
+  echo -e "  ▶ ${BLUE}Building wheel...${RESET}"
+  "$VENV_BIN_DIR/python3" setup.py bdist_wheel >> "$LOG_FILE" 2>&1
+  echo -e "    ✅ ${GREEN}Wheel built successfully${RESET}"
+
+  # Verify the executable after installation
   verify_nodup_executable
 fi
 
@@ -158,4 +170,3 @@ echo -e "➡ ${YELLOW}Ensure ~/.local/bin is in your PATH${RESET}"
 
 # Print bashrc update instructions
 print_instructions_for_bashrc_update
-

@@ -6,6 +6,8 @@ name = "pypi"
 [packages]
 pipenv = "*"
 argcomplete = "*"
-nodup = {file = "."}
+nodup = {file = "dist/nodup-1.1.0-py3-none-any.whl"}
 
 [dev-packages]
+setuptools = "*"
+wheel = "*"

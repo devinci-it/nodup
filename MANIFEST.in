@@ -1,7 +1,19 @@
-include requirements.txt
+# Include the README and LICENSE
 include README.md
+include LICENSE
+
+# Include setup.py, install.sh, wrapper.tmpl for distribution
 include setup.py
 include install.sh
 include wrapper.tmpl
-include LICENSE
 
+# Include requirements file 
+include requirements.txt
+
+# Include all Python source files under the src/nodup/ directory
+recursive-include src/nodup *.py
+
+# recursive-include tests *
+
+# Optional: include any other assets (e.g., static files, data, config, etc.)
+# recursive-include src/nodup/static *

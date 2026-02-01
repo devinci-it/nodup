@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "0c05c187f641b9b462db367a8dcc94b35dd6c6aae8740a88979b87778b94e461"
+            "sha256": "79541e4c6604e2c46c0e5f42d48e7a7623d01ab7724966ce8510ad05884899ef"
         },
         "pipfile-spec": 6,
         "requires": {},
@@ -47,7 +47,10 @@
             "version": "==3.20.3"
         },
         "nodup": {
-            "file": "."
+            "file": "dist/nodup-1.1.0-py3-none-any.whl",
+            "hashes": [
+                "sha256:bdf9fa2ad6de86566ea1d7391fcddd27995563de200a55e5afa6ca47fed0c765"
+            ]
         },
         "packaging": {
             "hashes": [
@@ -99,5 +102,32 @@
             "version": "==20.36.1"
         }
     },
-    "develop": {}
+    "develop": {
+        "packaging": {
+            "hashes": [
+                "sha256:00243ae351a257117b6a241061796684b084ed1c516a08c48a3f7e147a9d80b4",
+                "sha256:b36f1fef9334a5588b4166f8bcd26a14e521f2b55e6b9de3aaa80d3ff7a37529"
+            ],
+            "markers": "python_version >= '3.8'",
+            "version": "==26.0"
+        },
+        "setuptools": {
+            "hashes": [
+                "sha256:8b0e9d10c784bf7d262c4e5ec5d4ec94127ce206e8738f29a437945fbc219b70",
+                "sha256:95b30ddfb717250edb492926c92b5221f7ef3fbcc2b07579bcd4a27da21d0173"
+            ],
+            "index": "pypi",
+            "markers": "python_version >= '3.9'",
+            "version": "==80.10.2"
+        },
+        "wheel": {
+            "hashes": [
+                "sha256:4b399d56c9d9338230118d705d9737a2a468ccca63d5e813e2a4fc7815d8bc4d",
+                "sha256:e3e79874b07d776c40bd6033f8ddf76a7dad46a7b8aa1b2787a83083519a1803"
+            ],
+            "index": "pypi",
+            "markers": "python_version >= '3.9'",
+            "version": "==0.46.3"
+        }
+    }
 }
