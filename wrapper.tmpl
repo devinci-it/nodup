@@ -1,40 +1,39 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 
-APP_NAME="{{APP_NAME}}"
+# Wrapper Template for Running Commands with Arguments
+# Usage: Replace {{PROJECT_DIR}} with the project path and {{EXEC_NAME}} with the executable name
+
+# Define Project Details
 PROJECT_DIR="{{PROJECT_DIR}}"
+EXEC_NAME="{{EXEC_NAME}}"
 
-# Enable argparse autocomplete
-export _ARGCOMPLETE=1
-export ARGCOMPLETE_USE_TEMPFILES=1
+# Try to derive the virtual environment path based on pipenv
+VENV_PATH=$(cd "$PROJECT_DIR" && pipenv --venv)
 
-HINT_FILE="$HOME/.config/$APP_NAME/.autocomplete_hinted"
+# Fallback to looking for the .venv directory inside the project if pipenv venv is not found
+if [ ! -d "$VENV_PATH" ]; then
+    echo "❌ pipenv virtual environment not found. Looking for .venv directory..."
 
-if [ ! -f "$HINT_FILE" ]; then
-    if command -v register-python-argcomplete >/dev/null 2>&1; then
-        SHELL_NAME=$(basename "$SHELL")
-
-        echo ""
-        echo "💡 Enable tab completion for $APP_NAME:"
-        case "$SHELL_NAME" in
-            bash)
-                echo '   eval "$(register-python-argcomplete {{APP_NAME}})"'
-                ;;
-            zsh)
-                echo '   autoload -U bashcompinit && bashcompinit'
-                echo '   eval "$(register-python-argcomplete {{APP_NAME}})"'
-                ;;
-            *)
-                echo '   eval "$(register-python-argcomplete {{APP_NAME}})"'
-                ;;
-        esac
-        echo ""
-        echo "Add this to your shell config"
+    # Check if .venv exists in the project directory
+    VENV_PATH="$PROJECT_DIR/.venv"
+    if [ ! -d "$VENV_PATH" ]; then
+        echo "❌ No .venv directory found in $PROJECT_DIR!"
+        echo "⚠️ Please ensure you have a virtual environment set up."
+        echo "Alternatively, you can manually specify the path to your Python virtual environment's bin directory."
+        echo "For example, if you're using a different Python environment, provide the full path to the bin directory."
+        exit 1
     fi
-
-    mkdir -p "$(dirname "$HINT_FILE")"
-    touch "$HINT_FILE"
 fi
 
-cd "$PROJECT_DIR"
-exec pipenv run {{APP_NAME}} "$@"
+# Derive the bin directory inside the virtual environment
+VENV_BIN_DIR="$VENV_PATH/bin"
 
+# Check if the executable exists inside the virtual environment's bin directory
+if [ ! -f "$VENV_BIN_DIR/$EXEC_NAME" ]; then
+    echo "❌ $EXEC_NAME executable not found in virtual environment at $VENV_BIN_DIR."
+    exit 1
+fi
+
+# Execute the executable with the passed parameters
+echo "Executing: $VENV_BIN_DIR/$EXEC_NAME $@"
+"$VENV_BIN_DIR/$EXEC_NAME" "$@"

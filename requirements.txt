@@ -1,0 +1,9 @@
+argcomplete==3.6.3
+certifi==2026.1.4
+distlib==0.4.0
+filelock==3.20.3
+packaging==26.0
+pipenv==2026.0.3
+platformdirs==4.5.1
+typing_extensions==4.15.0
+virtualenv==20.36.1
