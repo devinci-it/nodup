@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='nodup',
-    version='1.1.0',
+    version='1.2.0',
     description="Find and optionally delete duplicate files by hash",
     author="Your Name",
     packages=find_packages(where='src'),
